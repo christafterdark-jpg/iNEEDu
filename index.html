@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071216">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="iNEEDu†">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg">
+<title>iNEEDu† — Examine. Surrender. Become.</title>
+<style>
+:root{
+  --bg:#071216; --panel:#0d1c21; --panel2:#112329; --line:#263a42;
+  --text:#f7f2e9; --muted:#93a3a8; --gold:#e7b56b; --gold2:#f2c981;
+  --cream:#f1ebe2; --ink:#1d292e; --good:#6ec89a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#061013;color:var(--text);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+body{min-height:100vh}
+#app{max-width:520px;margin:0 auto;min-height:100vh;background:linear-gradient(180deg,#071216,#08171b 70%,#061013);position:relative}
+.safe{padding:max(18px,env(safe-area-inset-top)) 18px calc(96px + env(safe-area-inset-bottom))}
+.status{height:20px;color:#a8b5b9;font-size:11px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-weight:800;font-size:34px;letter-spacing:-1.6px}
+.brand .u,.brand .cross{color:var(--gold)}
+.tag{font-size:11px;letter-spacing:.08em;color:#d8d0c5}
+h1{font-size:29px;line-height:1.06;letter-spacing:-.9px;margin:8px 0 7px}
+h2{font-size:20px;margin:0 0 8px}
+p{line-height:1.5}
+.muted{color:var(--muted)}
+.screen{display:none}
+.screen.active{display:block}
+.hero{position:relative;height:520px;margin:0 -18px;overflow:hidden;background:
+ radial-gradient(circle at 50% 21%,rgba(239,188,108,.30),transparent 24%),
+ linear-gradient(180deg,#182e35 0,#0d1d22 52%,#071216 100%)}
+.stars{position:absolute;inset:0;background-image:
+ radial-gradient(circle at 18% 15%,rgba(255,255,255,.65) 0 1px,transparent 1.5px),
+ radial-gradient(circle at 30% 24%,rgba(255,255,255,.34) 0 1px,transparent 1.5px),
+ radial-gradient(circle at 74% 14%,rgba(255,255,255,.55) 0 1px,transparent 1.5px),
+ radial-gradient(circle at 84% 33%,rgba(255,255,255,.24) 0 1px,transparent 1.5px)}
+.mountains{position:absolute;left:-8%;right:-8%;bottom:0;height:48%;background:#081519;
+ clip-path:polygon(0 65%,12% 47%,25% 60%,39% 31%,52% 53%,65% 34%,78% 58%,89% 43%,100% 59%,100% 100%,0 100%)}
+.path{position:absolute;left:42%;bottom:-8%;width:20%;height:62%;background:linear-gradient(#f0c277,rgba(210,143,57,.04));
+ clip-path:polygon(48% 0,58% 0,75% 22%,62% 39%,82% 57%,69% 75%,100% 100%,0 100%,39% 75%,27% 56%,54% 39%,40% 22%);
+ filter:drop-shadow(0 0 13px rgba(232,181,105,.34))}
+.heroCross{position:absolute;left:50%;top:14%;transform:translateX(-50%);width:15px;height:110px;background:#ffd58c;border-radius:3px;box-shadow:0 0 23px rgba(255,204,126,.82)}
+.heroCross:before{content:"";position:absolute;width:72px;height:15px;left:50%;top:31px;transform:translateX(-50%);background:#ffd58c;border-radius:3px;box-shadow:0 0 18px rgba(255,204,126,.72)}
+.fade{position:absolute;inset:0;background:linear-gradient(transparent 44%,rgba(7,18,22,.1) 58%,rgba(7,18,22,.95) 95%)}
+.heroText{position:absolute;left:22px;right:22px;bottom:26px;text-align:left;z-index:2}
+.heroText .brand{font-size:44px}
+.heroText .lead{font-size:17px;margin-top:42px}
+.btn{width:100%;min-height:50px;border:0;border-radius:14px;background:linear-gradient(#f1c37c,#dda458);color:#172329;font-weight:800;padding:0 15px}
+.btn.secondary{background:#102126;color:#ecf0ef;border:1px solid #3a4d55}
+.back{border:0;background:transparent;color:#c9d4d7;padding:2px 0 14px}
+.step{font-size:11px;text-align:center;color:#7f9095;letter-spacing:.08em;margin-bottom:8px}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:15px;padding:14px;margin:10px 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.pill{border:1px solid #3a4e56;background:#102126;color:#dce4e6;border-radius:999px;padding:7px 11px;font-size:12px}
+.cream{background:var(--cream);color:var(--ink);margin:0 -18px;padding:18px 18px 32px}
+.cream .muted{color:#5f6d72}
+.focus{border-top:1px solid #d1c7bb;border-bottom:1px solid #d1c7bb;padding:13px 0;margin:12px 0 18px}
+.focus small{font-weight:800;color:#8b5e28}
+.focus strong{display:block;font-size:26px}
+textarea,input,select{width:100%;border:1px solid #3b4e55;border-radius:12px;background:#102126;color:var(--text);padding:12px;min-height:48px;font-size:16px}
+textarea{min-height:110px;resize:vertical}
+.cream textarea{background:#fbf8f3;color:#243034;border-color:#cbc1b5}
+label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
+.entry{border:1px solid #34484f;border-radius:13px;padding:13px;background:#0d1b1f;margin:10px 0}
+.entry time{display:block;text-align:right;color:#7f9095;font-size:11px;margin-top:8px}
+.ratingGroup{padding:11px 0;border-bottom:1px solid var(--line)}
+.ratings{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px}
+.ratings button{min-height:38px;border:1px solid #354950;border-radius:8px;background:#14262b;color:#cbd4d7;font-size:10px;padding:5px}
+.ratings button.selected{background:var(--gold);color:#162126;border-color:var(--gold);font-weight:800}
+.iconCircle{width:62px;height:62px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;margin:10px auto 16px;color:var(--gold);font-size:28px}
+.summaryScore{width:138px;height:138px;margin:14px auto;border-radius:50%;background:conic-gradient(var(--gold) 0 74%,#28393f 74%);display:grid;place-items:center}
+.scoreInner{width:108px;height:108px;border-radius:50%;background:#071216;display:grid;place-items:center;text-align:center}
+.scoreInner strong{font-size:42px;line-height:1}
+.metric{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--line);background:#0d1b1f;padding:11px 12px;border-radius:11px;margin:8px 0}
+.metric small{color:#839399}
+.metric strong{text-align:right}
+.identityItem{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:12px 0}
+.identityItem small{color:#98a7ac;text-align:right}
+.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(520px,100%);padding-bottom:env(safe-area-inset-bottom);height:78px;background:rgba(6,16,19,.98);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);z-index:20}
+.nav button{border:0;background:transparent;color:#77888d;font-size:10px;display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center}
+.nav button.active{color:var(--gold)}
+.nav svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+.chart{height:190px;border-left:1px solid #41545a;border-bottom:1px solid #41545a;margin:24px 7px 18px;position:relative}
+.chart svg{position:absolute;inset:0;width:100%;height:100%}
+.notice{font-size:11px;color:#86969b;line-height:1.45;margin-top:12px}
+.inline{display:flex;gap:8px}
+.inline>*{flex:1}
+@media(max-width:360px){.ratings{grid-template-columns:repeat(2,1fr)}.brand{font-size:30px}.heroText .brand{font-size:39px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="safe">
+    <div class="status"><span>iNEEDu†</span><span>Examine. Surrender. Become.</span></div>
+
+    <section id="welcome" class="screen active">
+      <div class="hero">
+        <div class="stars"></div><div class="mountains"></div><div class="path"></div><div class="heroCross"></div><div class="fade"></div>
+        <div class="heroText">
+          <div class="brand">iNEED<span class="u">u</span><span class="cross">†</span></div>
+          <div class="tag">Examine. Surrender. Become.</div>
+          <p class="lead">A more honest you starts here.</p>
+          <button class="btn" data-go="struggles">Get Started</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="struggles" class="screen">
+      <div class="step">SETUP · 1 OF 2</div>
+      <h1>Let's be honest.</h1>
+      <p class="muted">When you're not walking according to the Spirit, what qualities, desires, habits, attitudes, or behaviors tend to show up in your life?</p>
+      <div id="struggleList"></div>
+      <div class="inline">
+        <input id="newStruggle" maxlength="40" placeholder="Add your own struggle">
+        <button class="pill" id="addStruggle" type="button">Add</button>
+      </div>
+      <button class="btn" data-go="identity" style="margin-top:14px">Continue</button>
+    </section>
+
+    <section id="identity" class="screen">
+      <div class="step">SETUP · 2 OF 2</div>
+      <h1>Your Identity</h1>
+      <p class="muted">Your identity is not based on your struggles, but on what God says about you.</p>
+      <div id="identityList"></div>
+      <button class="btn" data-go="home" style="margin-top:14px">Continue</button>
+    </section>
+
+    <section id="home" class="screen">
+      <h1>Your Walk with Christ</h1>
+      <p class="muted">Start with God's Word. Walk with Him throughout the day. End with honest reflection.</p>
+      <div class="cream" style="border-radius:16px;margin-top:16px">
+        <small style="font-weight:800;color:#8a5e29">TODAY'S SCRIPTURE</small>
+        <h2 style="margin-top:7px">2 Timothy 1:7</h2>
+        <p>“For God has not given us a spirit of fear and timidity, but of power, love, and self-discipline.”</p>
+        <button class="btn" data-go="devotional">Read Today's Devotional</button>
+      </div>
+      <div class="card">
+        <div class="row"><div><strong>Your Journal</strong><div class="muted" style="font-size:12px">Write throughout the day</div></div><button class="pill" data-go="journal">Open</button></div>
+        <div class="row"><div><strong>Evening Reflection</strong><div class="muted" style="font-size:12px">Examine your walk today</div></div><button class="pill" data-go="flesh">Begin</button></div>
+        <div class="row"><div><strong>Yesterday's Commitment</strong><div id="homeCommitment" class="muted" style="font-size:12px">No commitment saved yet.</div></div></div>
+      </div>
+    </section>
+
+    <section id="devotional" class="screen">
+      <button class="back" data-go="home">‹ Your Walk</button>
+      <div class="cream">
+        <div style="text-align:center;font-size:12px;color:#637176" id="todayDate"></div>
+        <div class="focus"><small>TODAY'S FOCUS</small><strong>Self-Control</strong></div>
+        <p>“For God has not given us a spirit of fear and timidity, but of power, love, and self-discipline.”<br><strong>2 Timothy 1:7</strong></p>
+        <h2>Devotional</h2>
+        <p>You don't have to obey every desire that enters your mind. Following Christ means learning that an urge can exist without becoming an action. The Holy Spirit doesn't just tell you to have self-control. He helps produce it in you.</p>
+        <h2>Reflect</h2>
+        <p>What desire has been controlling you lately?</p>
+        <textarea id="devotionalReflection" placeholder="Write your thoughts..."></textarea>
+        <h2 style="margin-top:18px">Prayer</h2>
+        <p>Jesus, lead me by Your Spirit today. Give me strength to choose what honors You. Amen.</p>
+        <h2>Today's Challenge</h2>
+        <p>When a strong urge appears, pray before you respond.</p>
+      </div>
+    </section>
+
+    <section id="journal" class="screen">
+      <h1>Your Journal</h1>
+      <p class="muted" id="journalDate"></p>
+      <label for="journalText">What's on your heart today?</label>
+      <textarea id="journalText" placeholder="Write freely..."></textarea>
+      <button class="btn" id="saveJournal" type="button" style="margin-top:10px">Add Entry</button>
+      <div id="journalEntries"></div>
+    </section>
+
+    <section id="flesh" class="screen">
+      <h1>How did you walk today?</h1>
+      <p class="muted">Be honest. There is no judgment here.</p>
+      <div id="fleshRatings"></div>
+      <button class="btn" data-go="fruit">Next</button>
+    </section>
+
+    <section id="fruit" class="screen">
+      <h1>Where did you see the Spirit at work today?</h1>
+      <p class="muted">How well did your life reflect these today?</p>
+      <div id="fruitRatings"></div>
+      <button class="btn" data-go="reflection">Next</button>
+    </section>
+
+    <section id="reflection" class="screen">
+      <h1>Take a moment to reflect.</h1>
+      <label for="victory">Where did I experience victory?</label>
+      <textarea id="victory"></textarea>
+      <label for="trigger">What triggered my biggest struggle?</label>
+      <select id="trigger">
+        <option value="">Choose one</option><option>Boredom</option><option>Stress</option><option>Anger</option><option>Loneliness</option><option>Temptation</option><option>Conflict</option><option>Other</option>
+      </select>
+      <label for="confess">Is there anything I need to confess?</label>
+      <textarea id="confess"></textarea>
+      <label for="apology">Do I need to apologize to anyone?</label>
+      <select id="apology"><option>No</option><option>Yes</option></select>
+      <button class="btn" data-go="surrender" style="margin-top:14px">Next</button>
+    </section>
+
+    <section id="surrender" class="screen">
+      <div class="iconCircle">†</div>
+      <h1 style="text-align:center">Surrender it to Christ.</h1>
+      <p class="muted" style="text-align:center">Don't just record it. Bring it to Christ through prayer.</p>
+      <label for="prayer">Write your prayer</label>
+      <textarea id="prayer" placeholder="Jesus, I surrender..."></textarea>
+      <button class="btn" data-go="become" style="margin-top:12px">I have prayed and surrendered this.</button>
+    </section>
+
+    <section id="become" class="screen">
+      <div class="iconCircle">◎</div>
+      <h1 style="text-align:center">What will obedience look like tomorrow?</h1>
+      <p class="muted" style="text-align:center">Choose ONE intentional step.</p>
+      <textarea id="commitment" placeholder="When temptation begins, I will..."></textarea>
+      <button class="btn" id="saveCommitment" type="button" style="margin-top:12px">Save Commitment</button>
+    </section>
+
+    <section id="summary" class="screen">
+      <p class="muted" style="text-align:center" id="summaryDate"></p>
+      <div class="summaryScore"><div class="scoreInner"><div><strong>74</strong><br><small>/100</small></div></div></div>
+      <div class="metric"><small>Strongest Fruit</small><strong id="sumFruit">Self-control</strong></div>
+      <div class="metric"><small>Main Struggle</small><strong id="sumStruggle">—</strong></div>
+      <div class="metric"><small>Main Trigger</small><strong id="sumTrigger">—</strong></div>
+      <div class="metric"><small>Victory</small><strong id="sumVictory">—</strong></div>
+      <div class="metric"><small>Tomorrow's Commitment</small><strong id="sumCommitment">—</strong></div>
+      <p class="notice">Your score reflects today's choices — not your worth, salvation, or God's love for you.</p>
+      <button class="btn" data-go="growth">View Your Growth</button>
+    </section>
+
+    <section id="growth" class="screen">
+      <h1>30-Day Growth</h1>
+      <div class="chart">
+        <svg viewBox="0 0 320 190" preserveAspectRatio="none" aria-label="Example growth trend">
+          <path d="M0 150 L70 138 L145 105 L220 78 L320 62" fill="none" stroke="#e7b56b" stroke-width="3"/>
+          <g fill="#e7b56b"><circle cx="0" cy="150" r="4"/><circle cx="70" cy="138" r="4"/><circle cx="145" cy="105" r="4"/><circle cx="220" cy="78" r="4"/><circle cx="320" cy="62" r="4"/></g>
+        </svg>
+      </div>
+      <h2>Key Insights</h2>
+      <div class="metric"><small>Overall trend</small><strong>Improving</strong></div>
+      <div class="metric"><small>Most improved</small><strong>Self-control</strong></div>
+      <div class="metric"><small>Most persistent</small><strong id="growthStruggle">—</strong></div>
+      <div class="metric"><small>Most frequent trigger</small><strong id="growthTrigger">—</strong></div>
+      <div class="metric"><small>Strongest Fruit</small><strong>Kindness</strong></div>
+      <div class="metric"><small>Area needing attention</small><strong>Patience</strong></div>
+    </section>
+
+    <section id="more" class="screen">
+      <h1>More</h1>
+      <div class="card">
+        <div class="row"><div><strong>Your Identity</strong><div class="muted" style="font-size:12px">Who you are in Christ</div></div><button class="pill" data-go="identity">Open</button></div>
+        <div class="row"><div><strong>Your Flesh List</strong><div class="muted" style="font-size:12px">Edit your personal struggles</div></div><button class="pill" data-go="struggles">Edit</button></div>
+        <div class="row"><div><strong>Reset demo data</strong><div class="muted" style="font-size:12px">Clears saved entries on this device</div></div><button class="pill" id="resetData" type="button">Reset</button></div>
+      </div>
+    </section>
+  </div>
+
+  <nav class="nav" id="nav" hidden>
+    <button data-go="home"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9H7v-7h10v7"/></svg>Home</button>
+    <button data-go="journal"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg>Journal</button>
+    <button data-go="flesh"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8 12h8"/></svg>Examine</button>
+    <button data-go="growth"><svg viewBox="0 0 24 24"><path d="M5 18v-6M12 18V7M19 18v-9"/></svg>Growth</button>
+    <button data-go="more"><svg viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01"/></svg>More</button>
+  </nav>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const defaults={
+  struggles:["Lust","Impatience","Pride","Anger","Procrastination","Marijuana","Gossip"],
+  journal:[], flesh:{}, fruit:{}, victory:"", trigger:"", confess:"", apology:"No", prayer:"", commitment:"", devotionalReflection:""
+};
+let state;
+try{ state={...defaults,...JSON.parse(localStorage.getItem("ineedu-v1")||"{}")}; }catch(e){state={...defaults};}
+const save=()=>localStorage.setItem("ineedu-v1",JSON.stringify(state));
+
+const identities=[
+["I am loved","Romans 8:38–39"],["I am a child of God","John 1:12"],["I am forgiven","1 John 1:9"],
+["The Holy Spirit lives in me","Romans 8:9"],["Christ gives me strength","Philippians 4:13"],
+["I can ask God for wisdom","James 1:5"],["God gives me self-control","2 Timothy 1:7"],
+["I am called to love others","1 John 4:7"],["I am called to patience","Colossians 3:12"],
+["I practice discipline","1 Corinthians 9:27"],["God has purpose for my life","Jeremiah 29:11"],
+["God gives me a new heart","Ezekiel 36:26"],["I can live in God's peace","Philippians 4:6–7"],
+["I can learn contentment","Philippians 4:11–12"],["I am growing in Christ","2 Peter 3:18"],
+["I am called to kindness and compassion","Ephesians 4:32"],["I am being transformed","Romans 12:2"],
+["I overcome through faith in Christ","1 John 5:4"],["I have eternal life through Christ","John 3:16"]
+];
+const fruits=["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness","Self-control"];
+const dateLabel=new Intl.DateTimeFormat("en-US",{month:"long",day:"numeric",year:"numeric"}).format(new Date());
+$("#todayDate").textContent=dateLabel; $("#journalDate").textContent=dateLabel; $("#summaryDate").textContent=dateLabel;
+
+function show(id){
+  $$(".screen").forEach(x=>x.classList.toggle("active",x.id===id));
+  $("#nav").hidden=["welcome","struggles","identity"].includes(id);
+  $$("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id || (id==="reflection"&&b.dataset.go==="flesh")));
+  if(id==="home") updateHome();
+  if(id==="summary") updateSummary();
+  if(id==="growth") updateGrowth();
+  window.scrollTo(0,0);
+}
+$$("[data-go]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.go)));
+
+function renderStruggles(){
+  $("#struggleList").innerHTML=state.struggles.map((s,i)=>`<div class="row"><span>${escapeHtml(s)}</span><button class="pill" data-remove="${i}" type="button">Remove</button></div>`).join("");
+  $$("[data-remove]").forEach(b=>b.addEventListener("click",()=>{state.struggles.splice(+b.dataset.remove,1);save();renderStruggles();renderFlesh();}));
+}
+$("#addStruggle").addEventListener("click",()=>{
+  const x=$("#newStruggle").value.trim();
+  if(x && !state.struggles.some(s=>s.toLowerCase()===x.toLowerCase())){state.struggles.push(x);$("#newStruggle").value="";save();renderStruggles();renderFlesh();}
+});
+function renderIdentity(){ $("#identityList").innerHTML=identities.map(x=>`<div class="identityItem"><strong>${x[0]}</strong><small>${x[1]}</small></div>`).join(""); }
+
+function ratingHtml(items,key,labels){
+  return items.map((name,i)=>`<div class="ratingGroup"><strong>${name}</strong><div class="ratings" data-rating="${key}" data-index="${i}">${labels.map(l=>`<button type="button" class="${state[key][i]===l?"selected":""}">${l}</button>`).join("")}</div></div>`).join("");
+}
+function wireRatings(){
+  $$(".ratings").forEach(g=>g.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>{
+    const key=g.dataset.rating,index=g.dataset.index; state[key][index]=btn.textContent; save();
+    g.querySelectorAll("button").forEach(x=>x.classList.toggle("selected",x===btn));
+  })));
+}
+function renderFlesh(){ $("#fleshRatings").innerHTML=ratingHtml(state.struggles,"flesh",["Not at all","A little","Strongly","Gave in"]); wireRatings(); }
+function renderFruit(){ $("#fruitRatings").innerHTML=ratingHtml(fruits,"fruit",["Struggled","Somewhat","Mostly","Strongly"]); wireRatings(); }
+
+$("#saveJournal").addEventListener("click",()=>{
+  const v=$("#journalText").value.trim(); if(!v)return;
+  state.journal.unshift({text:v,time:new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}); $("#journalText").value=""; save(); renderJournal();
+});
+function renderJournal(){ $("#journalEntries").innerHTML=state.journal.map(e=>`<div class="entry">${escapeHtml(e.text)}<time>${escapeHtml(e.time)}</time></div>`).join(""); }
+
+["victory","trigger","confess","apology","prayer","commitment","devotionalReflection"].forEach(id=>{
+  const el=$("#"+id); if(!el)return; el.value=state[id]||""; el.addEventListener("input",()=>{state[id]=el.value;save();});
+});
+$("#saveCommitment").addEventListener("click",()=>{state.commitment=$("#commitment").value.trim();save();show("summary");});
+
+function updateHome(){ $("#homeCommitment").textContent=state.commitment||"No commitment saved yet."; }
+function updateSummary(){
+  $("#sumStruggle").textContent=state.struggles.find((_,i)=>state.flesh[i]==="Gave in"||state.flesh[i]==="Strongly") || state.struggles[0] || "None recorded";
+  $("#sumTrigger").textContent=state.trigger||"Not recorded"; $("#sumVictory").textContent=state.victory||"Not recorded"; $("#sumCommitment").textContent=state.commitment||"Not recorded";
+}
+function updateGrowth(){ $("#growthStruggle").textContent=state.struggles[0]||"—"; $("#growthTrigger").textContent=state.trigger||"—"; }
+$("#resetData").addEventListener("click",()=>{ if(confirm("Clear all saved iNEEDu† demo data on this device?")){localStorage.removeItem("ineedu-v1");location.reload();}});
+
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));}
+renderStruggles();renderIdentity();renderFlesh();renderFruit();renderJournal();updateHome();
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "iNEEDu\u2020",
+  "short_name": "iNEEDu\u2020",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#071216",
+  "theme_color": "#071216",
+  "description": "Examine. Surrender. Become.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
