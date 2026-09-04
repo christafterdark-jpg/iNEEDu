@@ -84,7 +84,7 @@ label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
 .metric strong{text-align:right}
 .identityItem{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:12px 0}
 .identityItem small{color:#98a7ac;text-align:right}
-.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(520px,100%);padding-bottom:env(safe-area-inset-bottom);height:78px;background:rgba(6,16,19,.98);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);z-index:20}
+.nav[hidden]{display:none!important}.nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(520px,100%);padding-bottom:env(safe-area-inset-bottom);height:78px;background:rgba(6,16,19,.98);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);z-index:20}
 .nav button{border:0;background:transparent;color:#77888d;font-size:10px;display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center}
 .nav button.active{color:var(--gold)}
 .nav svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
@@ -94,6 +94,39 @@ label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
 .inline{display:flex;gap:8px}
 .inline>*{flex:1}
 @media(max-width:360px){.ratings{grid-template-columns:repeat(2,1fr)}.brand{font-size:30px}.heroText .brand{font-size:39px}}
+
+.welcome3d{
+  position:relative;
+  margin:0 -18px;
+  width:calc(100% + 36px);
+}
+.welcome3d img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+.welcomeHotspot{
+  position:absolute;
+  border:0;
+  background:transparent;
+  color:transparent;
+  padding:0;
+  margin:0;
+  z-index:5;
+}
+.welcomeHotspot:focus-visible{
+  outline:3px solid var(--gold2);
+  outline-offset:2px;
+  border-radius:14px;
+}
+.welcomeStart{
+  left:10.3%;
+  top:74.7%;
+  width:79.4%;
+  height:7.6%;
+  border-radius:999px;
+}
+
 </style>
 </head>
 <body>
@@ -102,14 +135,9 @@ label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
     <div class="status"><span>iNEEDu†</span><span>Examine. Surrender. Become.</span></div>
 
     <section id="welcome" class="screen active">
-      <div class="hero">
-        <div class="stars"></div><div class="mountains"></div><div class="path"></div><div class="heroCross"></div><div class="fade"></div>
-        <div class="heroText">
-          <div class="brand">iNEED<span class="u">u</span><span class="cross">†</span></div>
-          <div class="tag">Examine. Surrender. Become.</div>
-          <p class="lead">A more honest you starts here.</p>
-          <button class="btn" data-go="struggles">Get Started</button>
-        </div>
+      <div class="welcome3d">
+        <img src="home-3d.png" alt="A glowing cross over a mountain path with the iNEEDu† welcome design.">
+        <button class="welcomeHotspot welcomeStart" data-go="struggles" type="button" aria-label="Get Started">Get Started</button>
       </div>
     </section>
 
