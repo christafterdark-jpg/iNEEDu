@@ -641,7 +641,21 @@ $("#saveJournal").addEventListener("click",()=>{
   const v=$("#journalText").value.trim(); if(!v)return;
   state.journal.unshift({text:v,time:new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}); $("#journalText").value=""; save(); renderJournal();
 });
-function renderJournal(){ $("#journalEntries").innerHTML=state.journal.map(e=>`<div class="entry">${escapeHtml(e.text)}<time>${escapeHtml(e.time)}</time></div>`).join(""); }
+function renderJournal(){
+  $("#journalEntries").innerHTML=state.journal.map((e,i)=>`
+    <div class="entry">
+      ${escapeHtml(e.text)}
+      <time>${escapeHtml(e.time)}</time>
+      <button class="pill" data-delete-journal="${i}" type="button" style="margin-top:10px">Delete</button>
+    </div>
+  `).join("");
+
+  $$("[data-delete-journal]").forEach(b=>b.addEventListener("click",()=>{
+    state.journal.splice(+b.dataset.deleteJournal,1);
+    save();
+    renderJournal();
+  }));
+}
 
 function renderReflections(){
   const box=$("#savedReflections");
