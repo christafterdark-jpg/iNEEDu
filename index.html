@@ -127,17 +127,89 @@ label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
   border-radius:999px;
 }
 
+
+.welcomeNavHotspot{
+  position:absolute;
+  bottom:0.8%;
+  height:10.5%;
+  border:0;
+  background:transparent;
+  color:transparent;
+  z-index:6;
+}
+.welcomeNavHotspot:focus-visible{
+  outline:3px solid var(--gold2);
+  outline-offset:-3px;
+  border-radius:12px;
+}
+.welcomeNavHome{left:0%;width:20%}
+.welcomeNavJournal{left:20%;width:20%}
+.welcomeNavExamine{left:40%;width:20%}
+.welcomeNavGrowth{left:60%;width:20%}
+.welcomeNavMore{left:80%;width:20%}
+
+
+/* Interactive 3D welcome treatment */
+.welcome3d{
+  perspective:900px;
+  overflow:hidden;
+  background:#061013;
+  touch-action:pan-y;
+  isolation:isolate;
+}
+.welcome3d img{
+  transform:scale(1.035) translate3d(var(--px,0px),var(--py,0px),0);
+  transform-origin:center center;
+  transition:transform .22s ease-out, filter .22s ease-out;
+  will-change:transform,filter;
+  filter:saturate(1.04) contrast(1.03);
+}
+.welcome3d::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:2;
+  background:
+    radial-gradient(circle at var(--lx,50%) var(--ly,45%),rgba(255,195,95,.16),transparent 28%),
+    linear-gradient(180deg,rgba(255,255,255,.018),transparent 25%,rgba(0,0,0,.07));
+  mix-blend-mode:screen;
+}
+.welcomeStart{
+  transform:translateZ(34px) scale(1);
+  transition:transform .16s ease, filter .16s ease;
+}
+.welcomeStart:active{
+  transform:translateZ(10px) scale(.975);
+}
+.welcomeNavHotspot{
+  transform:translateZ(18px);
+  transition:transform .14s ease;
+}
+.welcomeNavHotspot:active{
+  transform:translateZ(5px) scale(.96);
+}
+@media (prefers-reduced-motion: reduce){
+  .welcome3d img{transform:none!important;transition:none}
+  .welcomeStart,.welcomeNavHotspot{transform:none!important;transition:none}
+}
+
 </style>
 </head>
 <body>
 <div id="app">
   <div class="safe">
-    <div class="status"><span>iNEEDu†</span><span>Examine. Surrender. Become.</span></div>
+    <div class="status" id="appStatus"><span>iNEEDu†</span><span>Examine. Surrender. Become.</span></div>
 
     <section id="welcome" class="screen active">
       <div class="welcome3d">
         <img src="home-3d.png" alt="A glowing cross over a mountain path with the iNEEDu† welcome design.">
         <button class="welcomeHotspot welcomeStart" data-go="struggles" type="button" aria-label="Get Started">Get Started</button>
+        <button class="welcomeNavHotspot welcomeNavHome" data-go="home" type="button" aria-label="Home">Home</button>
+        <button class="welcomeNavHotspot welcomeNavJournal" data-go="journal" type="button" aria-label="Journal">Journal</button>
+        <button class="welcomeNavHotspot welcomeNavExamine" data-go="flesh" type="button" aria-label="Examine">Examine</button>
+        <button class="welcomeNavHotspot welcomeNavGrowth" data-go="growth" type="button" aria-label="Growth">Growth</button>
+        <button class="welcomeNavHotspot welcomeNavMore" data-go="more" type="button" aria-label="More">More</button>
       </div>
     </section>
 
@@ -324,6 +396,7 @@ const dateLabel=new Intl.DateTimeFormat("en-US",{month:"long",day:"numeric",year
 $("#todayDate").textContent=dateLabel; $("#journalDate").textContent=dateLabel; $("#summaryDate").textContent=dateLabel;
 
 function show(id){
+  $("#appStatus").style.display = id==="welcome" ? "none" : "flex";
   $$(".screen").forEach(x=>x.classList.toggle("active",x.id===id));
   $("#nav").hidden=["welcome","struggles","identity"].includes(id);
   $$("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id || (id==="reflection"&&b.dataset.go==="flesh")));
@@ -377,6 +450,31 @@ $("#resetData").addEventListener("click",()=>{ if(confirm("Clear all saved iNEED
 
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));}
 renderStruggles();renderIdentity();renderFlesh();renderFruit();renderJournal();updateHome();
+
+// Touch/mouse parallax for the 3D welcome background.
+const welcome3d = document.querySelector(".welcome3d");
+if (welcome3d && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const resetWelcome3D = () => {
+    welcome3d.style.setProperty("--px","0px");
+    welcome3d.style.setProperty("--py","0px");
+    welcome3d.style.setProperty("--lx","50%");
+    welcome3d.style.setProperty("--ly","45%");
+  };
+  welcome3d.addEventListener("pointermove",(e)=>{
+    const r=welcome3d.getBoundingClientRect();
+    const nx=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+    const ny=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
+    const x=(.5-nx)*12;
+    const y=(.5-ny)*10;
+    welcome3d.style.setProperty("--px",x.toFixed(2)+"px");
+    welcome3d.style.setProperty("--py",y.toFixed(2)+"px");
+    welcome3d.style.setProperty("--lx",(nx*100).toFixed(1)+"%");
+    welcome3d.style.setProperty("--ly",(ny*100).toFixed(1)+"%");
+  });
+  welcome3d.addEventListener("pointerleave",resetWelcome3D);
+  welcome3d.addEventListener("pointercancel",resetWelcome3D);
+}
+
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 </script>
 </body>
