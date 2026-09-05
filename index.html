@@ -315,6 +315,22 @@ label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
   font-size:12px;
 }
 </style>
+
+<style>
+#auth .card input{
+  width:100%;
+  box-sizing:border-box;
+  margin:7px 0 16px;
+}
+#auth .card label{
+  display:block;
+  font-weight:700;
+  margin-top:4px;
+}
+#authSubmit:disabled{
+  opacity:.65;
+}
+</style>
 </head>
 <body>
 <div id="app">
@@ -335,9 +351,42 @@ label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
           <div class="welcomeMessage">
             <h1>Worship in the way you live.</h1>
             <p>Walk with Christ intentionally. Examine yourself daily. Surrender what needs to change. Become who you are called to be.</p>
-            <button class="welcomeRealStart" data-go="struggles" type="button">Get Started</button>
+            <button class="welcomeRealStart" data-go="auth" type="button">Get Started</button>
           </div>
         </div>
+      </div>
+    </section>
+
+    
+    <section id="auth" class="screen">
+      <div class="step">CREATE YOUR ACCOUNT</div>
+      <h1 id="authTitle">Join iNEEDu†</h1>
+      <p class="muted" id="authSubtitle">Create your account to save your walk, reflections, and growth.</p>
+
+      <div class="card" style="margin-top:18px">
+        <div id="usernameWrap">
+          <label for="authUsername">Username</label>
+          <input id="authUsername" type="text" maxlength="24" autocomplete="username" placeholder="Choose a username">
+        </div>
+
+        <label for="authEmail">Email</label>
+        <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
+
+        <label for="authPassword">Password</label>
+        <input id="authPassword" type="password" minlength="8" autocomplete="new-password" placeholder="At least 8 characters">
+
+        <div id="confirmPasswordWrap">
+          <label for="authPasswordConfirm">Confirm Password</label>
+          <input id="authPasswordConfirm" type="password" minlength="8" autocomplete="new-password" placeholder="Re-enter your password">
+        </div>
+
+        <p id="authMessage" class="muted" style="min-height:20px;margin:10px 0 0"></p>
+
+        <button class="btn" id="authSubmit" type="button" style="margin-top:12px">Create Account</button>
+
+        <button class="pill" id="authToggle" type="button" style="width:100%;margin-top:10px">
+          Already have an account? Sign In
+        </button>
       </div>
     </section>
 
@@ -606,7 +655,7 @@ $("#todayDate").textContent=dateLabel; $("#journalDate").textContent=dateLabel; 
 function show(id){
   $("#appStatus").style.display = "flex";
   $$(".screen").forEach(x=>x.classList.toggle("active",x.id===id));
-  $("#nav").hidden=["welcome","struggles","identity"].includes(id);
+  $("#nav").hidden=["welcome","auth","struggles","identity"].includes(id);
   $$("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.go===id || (id==="reflection"&&b.dataset.go==="flesh")));
   if(id==="home") updateHome();
   if(id==="summary") updateSummary();
@@ -743,6 +792,129 @@ if (welcome3d && !window.matchMedia("(prefers-reduced-motion: reduce)").matches)
   welcome3d.addEventListener("pointerleave",resetWelcome3D);
   welcome3d.addEventListener("pointercancel",resetWelcome3D);
 }
+
+
+// ----------------------
+// ACCOUNT AUTHENTICATION
+// ----------------------
+// Create a free Supabase project, then paste your Project URL and anon public key below.
+// Do NOT use the service-role key in browser code.
+const SUPABASE_URL = "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_PUBLIC_KEY_HERE";
+
+let supabaseClient = null;
+let authMode = "signup";
+
+async function getSupabase(){
+  if(supabaseClient) return supabaseClient;
+
+  if(
+    SUPABASE_URL.includes("PASTE_YOUR_") ||
+    SUPABASE_ANON_KEY.includes("PASTE_YOUR_")
+  ){
+    throw new Error("Account system is not connected yet.");
+  }
+
+  const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  return supabaseClient;
+}
+
+function setAuthMode(mode){
+  authMode = mode;
+  const signup = mode === "signup";
+
+  $("#authTitle").textContent = signup ? "Join iNEEDu†" : "Welcome Back";
+  $("#authSubtitle").textContent = signup
+    ? "Create your account to save your walk, reflections, and growth."
+    : "Sign in to continue your walk.";
+
+  $("#usernameWrap").style.display = signup ? "block" : "none";
+  $("#confirmPasswordWrap").style.display = signup ? "block" : "none";
+  $("#authSubmit").textContent = signup ? "Create Account" : "Sign In";
+  $("#authToggle").textContent = signup
+    ? "Already have an account? Sign In"
+    : "Need an account? Create One";
+
+  $("#authPassword").setAttribute("autocomplete", signup ? "new-password" : "current-password");
+  $("#authMessage").textContent = "";
+}
+
+$("#authToggle").addEventListener("click",()=>{
+  setAuthMode(authMode === "signup" ? "signin" : "signup");
+});
+
+$("#authSubmit").addEventListener("click", async ()=>{
+  const username = $("#authUsername").value.trim();
+  const email = $("#authEmail").value.trim();
+  const password = $("#authPassword").value;
+  const confirmPassword = $("#authPasswordConfirm").value;
+  const msg = $("#authMessage");
+  const btn = $("#authSubmit");
+
+  msg.textContent = "";
+
+  if(!email || !password){
+    msg.textContent = "Enter your email and password.";
+    return;
+  }
+
+  if(authMode === "signup"){
+    if(!username){
+      msg.textContent = "Choose a username.";
+      return;
+    }
+    if(password.length < 8){
+      msg.textContent = "Password must be at least 8 characters.";
+      return;
+    }
+    if(password !== confirmPassword){
+      msg.textContent = "Passwords do not match.";
+      return;
+    }
+  }
+
+  btn.disabled = true;
+  btn.textContent = authMode === "signup" ? "Creating Account..." : "Signing In...";
+
+  try{
+    const supabase = await getSupabase();
+
+    if(authMode === "signup"){
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options:{
+          data:{ username }
+        }
+      });
+      if(error) throw error;
+
+      if(data.session){
+        show("struggles");
+      }else{
+        msg.textContent = "Account created. Check your email to confirm your account, then sign in.";
+        setAuthMode("signin");
+      }
+    }else{
+      const { data, error } = await supabase.auth.signInWithPassword({email,password});
+      if(error) throw error;
+      if(data.session) show("home");
+    }
+  }catch(err){
+    if(String(err.message).includes("Account system is not connected yet")){
+      msg.textContent = "Account system is ready in the app, but Supabase still needs to be connected.";
+    }else{
+      msg.textContent = err.message || "Something went wrong. Try again.";
+    }
+  }finally{
+    btn.disabled = false;
+    btn.textContent = authMode === "signup" ? "Create Account" : "Sign In";
+  }
+});
+
+setAuthMode("signup");
+
 
 if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
 </script>
