@@ -302,6 +302,19 @@ label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
 @media (prefers-reduced-motion:reduce){#threeBg{display:none}}
 </style>
 
+<style>
+#savedReflections .entry{
+  background:rgba(255,255,255,.58);
+  border:1px solid rgba(138,94,41,.18);
+  color:#111;
+}
+#savedReflections .entry time{
+  display:block;
+  margin-top:8px;
+  color:#6f6a61;
+  font-size:12px;
+}
+</style>
 </head>
 <body>
 <div id="app">
@@ -375,6 +388,13 @@ label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
         <h2>Reflect</h2>
         <p>What desire has been controlling you lately?</p>
         <textarea id="devotionalReflection" placeholder="Write your thoughts..."></textarea>
+        <button class="btn" id="saveDevotionalReflection" type="button" style="margin-top:10px">Save Reflection</button>
+
+        <div id="savedReflectionsWrap" style="margin-top:22px">
+          <h2>Your Reflections</h2>
+          <div id="savedReflections"></div>
+        </div>
+
         <h2 style="margin-top:18px">Prayer</h2>
         <p>Jesus, lead me by Your Spirit today. Give me strength to choose what honors You. Amen.</p>
         <h2>Today's Challenge</h2>
@@ -489,7 +509,7 @@ label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const defaults={
   struggles:["Lust","Impatience","Pride","Anger","Procrastination","Substance Abuse","Gossip"],
-  journal:[], flesh:{}, fruit:{}, victory:"", trigger:"", confess:"", apology:"No", prayer:"", commitment:"", devotionalReflection:""
+  journal:[], reflections:[], flesh:{}, fruit:{}, victory:"", trigger:"", confess:"", apology:"No", prayer:"", commitment:"", devotionalReflection:""
 };
 let state;
 try{ state={...defaults,...JSON.parse(localStorage.getItem("ineedu-v1")||"{}")}; }catch(e){state={...defaults};}
@@ -623,9 +643,55 @@ $("#saveJournal").addEventListener("click",()=>{
 });
 function renderJournal(){ $("#journalEntries").innerHTML=state.journal.map(e=>`<div class="entry">${escapeHtml(e.text)}<time>${escapeHtml(e.time)}</time></div>`).join(""); }
 
-["victory","trigger","confess","apology","prayer","commitment","devotionalReflection"].forEach(id=>{
+function renderReflections(){
+  const box=$("#savedReflections");
+  if(!box)return;
+  if(!state.reflections || !state.reflections.length){
+    box.innerHTML='<p class="muted" style="margin-top:8px">No reflections saved yet.</p>';
+    return;
+  }
+  box.innerHTML=state.reflections.map((r,i)=>`
+    <div class="entry">
+      ${escapeHtml(r.text)}
+      <time>${escapeHtml(r.date)} · ${escapeHtml(r.time)}</time>
+      <button class="pill" data-delete-reflection="${i}" type="button" style="margin-top:10px">Delete</button>
+    </div>
+  `).join("");
+  $$("[data-delete-reflection]").forEach(b=>b.addEventListener("click",()=>{
+    state.reflections.splice(+b.dataset.deleteReflection,1);
+    save();
+    renderReflections();
+  }));
+}
+
+$("#saveDevotionalReflection").addEventListener("click",()=>{
+  const text=$("#devotionalReflection").value.trim();
+  if(!text)return;
+
+  const now=new Date();
+  const date=new Intl.DateTimeFormat("en-US",{
+    timeZone:"America/New_York",
+    month:"short",day:"numeric",year:"numeric"
+  }).format(now);
+  const time=new Intl.DateTimeFormat("en-US",{
+    timeZone:"America/New_York",
+    hour:"numeric",minute:"2-digit"
+  }).format(now);
+
+  if(!Array.isArray(state.reflections))state.reflections=[];
+  state.reflections.unshift({text,date,time});
+  state.devotionalReflection="";
+  $("#devotionalReflection").value="";
+  save();
+  renderReflections();
+});
+
+["victory","trigger","confess","apology","prayer","commitment"].forEach(id=>{
   const el=$("#"+id); if(!el)return; el.value=state[id]||""; el.addEventListener("input",()=>{state[id]=el.value;save();});
 });
+
+const devotionalReflectionEl=$("#devotionalReflection");
+if(devotionalReflectionEl) devotionalReflectionEl.value=state.devotionalReflection||"";
 $("#saveCommitment").addEventListener("click",()=>{state.commitment=$("#commitment").value.trim();save();show("summary");});
 
 function updateHome(){ $("#homeCommitment").textContent=state.commitment||"No commitment saved yet."; }
@@ -637,7 +703,7 @@ function updateGrowth(){ $("#growthStruggle").textContent=state.struggles[0]||"�
 $("#resetData").addEventListener("click",()=>{ if(confirm("Clear all saved iNEEDu† demo data on this device?")){localStorage.removeItem("ineedu-v1");location.reload();}});
 
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));}
-renderStruggles();renderIdentity();renderFlesh();renderFruit();renderJournal();updateDailyScripture();updateHome();show("welcome");
+renderStruggles();renderIdentity();renderFlesh();renderFruit();renderJournal();renderReflections();updateDailyScripture();updateHome();show("welcome");
 setInterval(updateDailyScripture,60000);
 
 // Touch/mouse parallax for the 3D welcome background.
