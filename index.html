@@ -353,8 +353,8 @@ label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
       <p class="muted">Start with God's Word. Walk with Him throughout the day. End with honest reflection.</p>
       <div class="cream" style="border-radius:16px;margin-top:16px">
         <small style="font-weight:800;color:#8a5e29">TODAY'S SCRIPTURE</small>
-        <h2 style="margin-top:7px">2 Timothy 1:7</h2>
-        <p>“For God has not given us a spirit of fear and timidity, but of power, love, and self-discipline.”</p>
+        <h2 id="homeScriptureRef" style="margin-top:7px">2 Timothy 1:7</h2>
+        <p id="homeScriptureText">For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.</p>
         <button class="btn" data-go="devotional">Read Today's Devotional</button>
       </div>
       <div class="card">
@@ -368,8 +368,8 @@ label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
       <button class="back" data-go="home">‹ Your Walk</button>
       <div class="cream">
         <div style="text-align:center;font-size:12px;color:#637176" id="todayDate"></div>
-        <div class="focus"><small>TODAY'S FOCUS</small><strong>Self-Control</strong></div>
-        <p>“For God has not given us a spirit of fear and timidity, but of power, love, and self-discipline.”<br><strong>2 Timothy 1:7</strong></p>
+        <div class="focus"><small>TODAY'S FOCUS</small><strong id="dailyFocus">Self-Control</strong></div>
+        <p><span id="devotionalScriptureText">For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.</span><br><strong id="devotionalScriptureRef">2 Timothy 1:7</strong></p>
         <h2>Devotional</h2>
         <p>You don't have to obey every desire that enters your mind. Following Christ means learning that an urge can exist without becoming an action. The Holy Spirit doesn't just tell you to have self-control. He helps produce it in you.</p>
         <h2>Reflect</h2>
@@ -507,7 +507,80 @@ const identities=[
 ["I overcome through faith in Christ","1 John 5:4"],["I have eternal life through Christ","John 3:16"]
 ];
 const fruits=["Love","Joy","Peace","Patience","Kindness","Goodness","Faithfulness","Gentleness","Self-control"];
-const dateLabel=new Intl.DateTimeFormat("en-US",{month:"long",day:"numeric",year:"numeric"}).format(new Date());
+
+const dailyScriptures=[
+  {ref:"2 Timothy 1:7",focus:"Self-Control",text:"For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind."},
+  {ref:"Philippians 4:13",focus:"Strength",text:"I can do all things through Christ which strengtheneth me."},
+  {ref:"Proverbs 3:5–6",focus:"Trust",text:"Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths."},
+  {ref:"Romans 12:2",focus:"Transformation",text:"Be not conformed to this world: but be ye transformed by the renewing of your mind."},
+  {ref:"Galatians 5:22–23",focus:"Fruit of the Spirit",text:"The fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith, meekness, temperance."},
+  {ref:"Psalm 51:10",focus:"Renewal",text:"Create in me a clean heart, O God; and renew a right spirit within me."},
+  {ref:"James 1:5",focus:"Wisdom",text:"If any of you lack wisdom, let him ask of God, that giveth to all men liberally."},
+  {ref:"Matthew 6:33",focus:"Priority",text:"Seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you."},
+  {ref:"1 Corinthians 10:13",focus:"Temptation",text:"God is faithful, who will not suffer you to be tempted above that ye are able; but will with the temptation also make a way to escape."},
+  {ref:"Colossians 3:12",focus:"Character",text:"Put on therefore, as the elect of God, holy and beloved, bowels of mercies, kindness, humbleness of mind, meekness, longsuffering."},
+  {ref:"Ephesians 4:32",focus:"Kindness",text:"Be ye kind one to another, tenderhearted, forgiving one another, even as God for Christ's sake hath forgiven you."},
+  {ref:"Philippians 4:6–7",focus:"Peace",text:"Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God."},
+  {ref:"John 15:5",focus:"Abiding",text:"I am the vine, ye are the branches: He that abideth in me, and I in him, the same bringeth forth much fruit."},
+  {ref:"Luke 9:23",focus:"Surrender",text:"If any man will come after me, let him deny himself, and take up his cross daily, and follow me."},
+  {ref:"Psalm 119:105",focus:"Guidance",text:"Thy word is a lamp unto my feet, and a light unto my path."},
+  {ref:"Romans 8:28",focus:"Trust",text:"All things work together for good to them that love God, to them who are the called according to his purpose."},
+  {ref:"1 John 1:9",focus:"Confession",text:"If we confess our sins, he is faithful and just to forgive us our sins, and to cleanse us from all unrighteousness."},
+  {ref:"Micah 6:8",focus:"Obedience",text:"What doth the LORD require of thee, but to do justly, and to love mercy, and to walk humbly with thy God?"},
+  {ref:"Psalm 46:10",focus:"Stillness",text:"Be still, and know that I am God."},
+  {ref:"Isaiah 40:31",focus:"Endurance",text:"They that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles."},
+  {ref:"Matthew 11:28",focus:"Rest",text:"Come unto me, all ye that labour and are heavy laden, and I will give you rest."},
+  {ref:"Joshua 1:9",focus:"Courage",text:"Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee."},
+  {ref:"Romans 8:31",focus:"Confidence",text:"If God be for us, who can be against us?"},
+  {ref:"1 Peter 5:7",focus:"Surrender",text:"Casting all your care upon him; for he careth for you."},
+  {ref:"Proverbs 4:23",focus:"Heart",text:"Keep thy heart with all diligence; for out of it are the issues of life."},
+  {ref:"Hebrews 12:1",focus:"Perseverance",text:"Let us lay aside every weight, and the sin which doth so easily beset us, and let us run with patience the race that is set before us."},
+  {ref:"James 1:22",focus:"Action",text:"Be ye doers of the word, and not hearers only, deceiving your own selves."},
+  {ref:"John 13:34",focus:"Love",text:"A new commandment I give unto you, That ye love one another; as I have loved you."},
+  {ref:"Romans 5:3–4",focus:"Growth",text:"Tribulation worketh patience; and patience, experience; and experience, hope."},
+  {ref:"Psalm 37:5",focus:"Commitment",text:"Commit thy way unto the LORD; trust also in him; and he shall bring it to pass."},
+  {ref:"2 Corinthians 5:17",focus:"New Life",text:"If any man be in Christ, he is a new creature: old things are passed away; behold, all things are become new."}
+];
+
+function easternParts(date=new Date()){
+  const parts=new Intl.DateTimeFormat("en-US",{
+    timeZone:"America/New_York",
+    year:"numeric",month:"2-digit",day:"2-digit",
+    hour:"2-digit",hourCycle:"h23"
+  }).formatToParts(date);
+  const out={};
+  parts.forEach(p=>{if(p.type!=="literal")out[p.type]=p.value;});
+  return {year:+out.year,month:+out.month,day:+out.day,hour:+out.hour};
+}
+
+function dailyScriptureKey(date=new Date()){
+  const p=easternParts(date);
+  let dayUTC=Date.UTC(p.year,p.month-1,p.day);
+  if(p.hour<7) dayUTC-=86400000;
+  return Math.floor(dayUTC/86400000);
+}
+
+let activeScriptureKey=null;
+function updateDailyScripture(){
+  const key=dailyScriptureKey();
+  if(key===activeScriptureKey)return;
+  activeScriptureKey=key;
+  const item=dailyScriptures[((key%dailyScriptures.length)+dailyScriptures.length)%dailyScriptures.length];
+
+  const homeRef=$("#homeScriptureRef");
+  const homeText=$("#homeScriptureText");
+  const devRef=$("#devotionalScriptureRef");
+  const devText=$("#devotionalScriptureText");
+  const focus=$("#dailyFocus");
+
+  if(homeRef)homeRef.textContent=item.ref;
+  if(homeText)homeText.textContent=item.text;
+  if(devRef)devRef.textContent=item.ref;
+  if(devText)devText.textContent=item.text;
+  if(focus)focus.textContent=item.focus;
+}
+
+const dateLabel=new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",month:"long",day:"numeric",year:"numeric"}).format(new Date());
 $("#todayDate").textContent=dateLabel; $("#journalDate").textContent=dateLabel; $("#summaryDate").textContent=dateLabel;
 
 function show(id){
@@ -564,7 +637,8 @@ function updateGrowth(){ $("#growthStruggle").textContent=state.struggles[0]||"�
 $("#resetData").addEventListener("click",()=>{ if(confirm("Clear all saved iNEEDu† demo data on this device?")){localStorage.removeItem("ineedu-v1");location.reload();}});
 
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));}
-renderStruggles();renderIdentity();renderFlesh();renderFruit();renderJournal();updateHome();show("welcome");
+renderStruggles();renderIdentity();renderFlesh();renderFruit();renderJournal();updateDailyScripture();updateHome();show("welcome");
+setInterval(updateDailyScripture,60000);
 
 // Touch/mouse parallax for the 3D welcome background.
 const welcome3d = document.querySelector(".welcome3d");
