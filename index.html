@@ -407,7 +407,7 @@ label{display:block;color:#aab6ba;font-size:13px;margin:12px 0 6px}
       <h1>Your Identity</h1>
       <p class="muted">Your identity is not based on your struggles, but on what God says about you.</p>
       <div id="identityList"></div>
-      <button class="btn" data-go="home" style="margin-top:14px">Continue</button>
+      <button class="btn" id="finishSetup" type="button" style="margin-top:14px">Continue</button>
     </section>
 
     <section id="home" class="screen">
@@ -798,6 +798,7 @@ if (welcome3d && !window.matchMedia("(prefers-reduced-motion: reduce)").matches)
 // ACCOUNT AUTHENTICATION
 // ----------------------
 const SUPABASE_URL = "https://etuhxagcqqqsvduhkvyd.supabase.co";
+const APP_URL = "https://christafterdark-jpg.github.io/iNEEDu/";
 const SUPABASE_ANON_KEY = "sb_publishable_dTIqp5caYabql2IsoppeUA_CBYxBKu3";
 
 let authMode = "signup";
@@ -887,7 +888,7 @@ $("#authSubmit").addEventListener("click", async ()=>{
 
   try{
     if(authMode === "signup"){
-      const data = await supabaseRequest("/auth/v1/signup", {
+      const data = await supabaseRequest("/auth/v1/signup?redirect_to=" + encodeURIComponent(APP_URL), {
         email,
         password,
         data:{ username }
@@ -915,7 +916,8 @@ $("#authSubmit").addEventListener("click", async ()=>{
         refresh_token:data.refresh_token,
         user:data.user
       }));
-      show("home");
+      const setupDone = data.user?.id && localStorage.getItem("ineedu-setup-" + data.user.id) === "done";
+      show(setupDone ? "home" : "struggles");
     }
   }catch(err){
     console.error("Auth error:", err);
@@ -925,6 +927,61 @@ $("#authSubmit").addEventListener("click", async ()=>{
     btn.textContent = authMode === "signup" ? "Create Account" : "Sign In";
   }
 });
+
+
+function getCurrentAuth(){
+  try{
+    return JSON.parse(localStorage.getItem("ineedu-auth") || "null");
+  }catch(e){
+    return null;
+  }
+}
+
+const finishSetupButton = $("#finishSetup");
+if(finishSetupButton){
+  finishSetupButton.addEventListener("click",()=>{
+    const auth = getCurrentAuth();
+    if(auth?.user?.id){
+      localStorage.setItem("ineedu-setup-" + auth.user.id, "done");
+    }
+    show("home");
+  });
+}
+
+// If Supabase redirects back after email confirmation with a session in the URL,
+// save it and send first-time users directly into setup.
+(async function handleSupabaseCallback(){
+  if(!location.hash || !location.hash.includes("access_token=")) return;
+
+  const params = new URLSearchParams(location.hash.slice(1));
+  const access_token = params.get("access_token");
+  const refresh_token = params.get("refresh_token");
+  if(!access_token) return;
+
+  try{
+    const response = await fetch(SUPABASE_URL + "/auth/v1/user", {
+      headers:{
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + access_token
+      }
+    });
+
+    const user = response.ok ? await response.json() : null;
+
+    localStorage.setItem("ineedu-auth", JSON.stringify({
+      access_token,
+      refresh_token,
+      user
+    }));
+
+    history.replaceState(null, "", location.pathname + location.search);
+
+    const setupDone = user?.id && localStorage.getItem("ineedu-setup-" + user.id) === "done";
+    show(setupDone ? "home" : "struggles");
+  }catch(err){
+    console.error("Confirmation callback error:", err);
+  }
+})();
 
 setAuthMode("signup");
 
