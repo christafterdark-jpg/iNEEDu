@@ -1,17 +1,24 @@
 {
-  "name": "iNEEDu\u2020",
-  "short_name": "iNEEDu\u2020",
+  "name": "iNEEDu† — Examine · Surrender · Become",
+  "short_name": "iNEEDu†",
+  "id": "./",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#071216",
-  "theme_color": "#071216",
-  "description": "Examine. Surrender. Become.",
+  "background_color": "#080d20",
+  "theme_color": "#080d20",
   "icons": [
     {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "icon-192.png?v=2",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png?v=2",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
